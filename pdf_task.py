@@ -109,24 +109,117 @@ pdf.cell(39, 0, txt='Invoice No.:', align='R')
 
 
 # Account details
-pdf.set_xy(10, 68)
+pdf.set_xy(5, 68)
 pdf.set_font('Arial')
-pdf.cell(20, 0, txt='Account', ln=0, align='L')
+pdf.cell(15, 0, txt='Account', ln=0, align='L')
 pdf.cell(60, 0, txt='Account Name', ln=0, align='C')
-pdf.cell(15, 0, txt='Type', ln=0, align='C')
-pdf.cell(15, 0, txt='Product', ln=0, align='C')
+pdf.cell(10, 0, txt='Type', ln=0, align='C')
+pdf.cell(15, 0, txt='Dept.', ln=0, align='C')
+pdf.cell(20, 0, txt='Product', ln=0, align='C')
 pdf.cell(40, 0, txt='Transaction Text', ln=0, align='C')
-pdf.cell(20, 0, txt='Debit', ln=0, align='C')
-pdf.cell(20, 0, txt='Credit', ln=0, align='C')
+pdf.cell(20, 0, txt='Debit', ln=0, align='R')
+pdf.cell(20, 0, txt='Credit', ln=0, align='R')
 
 data = [{'Account': 212003, 
         'Account Name': 'Accounts Payable - Repair and Maintainance of Lease Vehicle', 
+        'Dept': '',
+        'Type': '',
+        'Product': '',
         'Transaction Text': 'Outgoing Payments',
-        'Debit': 420825},
+        'Debit': 420825, 
+        'Credit': ''},
         {'Account': 111151, 
         'Account Name': 'Current Account - Bangkok Bank', 
+        'Dept': '',
+        'Type': '',
+        'Product': '',
         'Transaction Text': 'Outgoing Payments',
-        'Credit': 420825}]
+        'Debit': '',
+        'Credit': 420825}, 
+        {'Account': 115404, 
+        'Account Name': 'Duumy Account for e-Withholding Tax', 
+        'Dept': '',
+        'Type': '',
+        'Product': '',
+        'Transaction Text': 'Outgoing Payments',
+        'Debit': '',
+        'Credit': -3933},
+        {'Account': 215307, 
+        'Account Name': 'Withholding Tax Payable - e - Withholding Tax', 
+        'Dept': '',
+        'Type': '',
+        'Product': '',
+        'Transaction Text': 'Outgoing Payments',
+        'Debit': '',
+        'Credit': 3933}]
+# y = 78
+# for i in data:
+#     pdf.set_xy(10, y)
+#     pdf.cell(20, 0, txt=str(i['Account']), ln=0, align='L')
+#     pdf.cell(60, 0, txt=i['Account Name'], ln=0, align='C')
+#     pdf.cell(15, 0, txt=i['Type'], ln=0, align='C')
+#     pdf.cell(15, 0, txt=i['Product'], ln=0, align='C')
+#     pdf.cell(40, 0, txt=i['Transaction Text'], ln=0, align='C')
+#     pdf.cell(20, 0, txt=str(i['Debit']), ln=0, align='C')
+#     pdf.cell(20, 0, txt=str(i['Credit']), ln=1, align='C')
+#     y += 10
 
+y = 78
+
+# Column widths
+column_widths = [15, 60, 10, 15, 20, 40, 20, 20]  # Adjust these widths as needed
+debit = 0
+credit = 0
+# Iterate over data
+for i in data:
+    # Set x and y position for the cells
+    # pdf.set_xy(10, y)
+    x = 5
+    # Add data to cells
+    # for j, key in data[0].keys():
+    for j, key in enumerate(data[0]):
+        if key == 'Debit' and i['Debit'] != "":
+            debit += i['Debit']
+        if key == 'Credit' and i['Credit'] != "":
+            credit += i['Credit']
+
+        text = str(i.get(key, ''))
+        width = column_widths[j]
+        if key == 'Account Name':
+            pdf.set_xy(10 + column_widths[0], y-3)
+            pdf.multi_cell(width, 5, txt=text, align='L')
+        elif key == 'Account':
+            pdf.set_xy(x, y)
+            pdf.cell(width, 0, txt=text, ln=0, align='L')
+        else:
+            pdf.set_xy(x, y)
+            pdf.cell(width, 0, txt=text, ln=0, align='R')
+        x += width  
+    # Move to next line after adding the row
+    pdf.ln()
+    
+    # Update y-coordinate for the next row
+    y += 12  # Adjust this value as needed to increase/decrease spacing between rows
+
+pdf.set_xy(145, y)
+pdf.cell(20, 0, txt='Total:', align='R', ln=0)
+pdf.cell(20, 0, txt=str(debit), align='R', ln=0)
+pdf.cell(20, 0, txt=str(credit), align='R', ln=1)
+
+
+pdf.set_xy(5, y + 8)
+pdf.set_font('Arial', style='BU', size=12)
+pdf.cell(0, 0, txt='Payment Details', ln=0, align='L')
+
+pdf.set_xy(5, y + 18)
+pdf.set_font('Arial', style='', size=11)
+pdf.cell(20, 0, txt='Date', align='L', ln=0)
+pdf.cell(20, 0, txt='DueDate', align='L', ln=0)
+pdf.cell(20, 0, txt='Bill No.', align='L', ln=0)
+pdf.cell(20, 0, txt='Voucher', align='L', ln=0)
+pdf.cell(20, 0, txt='Invoice', align='L', ln=0)
+pdf.cell(35, 0, txt='Ammount Currency', align='L', ln=0)
+pdf.cell(35, 0, txt='Ammount Settled Cur', align='L', ln=0)
+pdf.cell(20, 0, txt='Amt Settled(THB)', align='L', ln=0)
 pdf.output(output_path)
 
